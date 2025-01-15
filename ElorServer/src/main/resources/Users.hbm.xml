@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Generated 15 ene 2025, 17:22:52 by Hibernate Tools 6.5.1.Final --><!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class catalog="laravel" name="bbdd.pojos.Users" optimistic-lock="none" table="users">
+        <id name="id" type="java.lang.Long">
+            <column name="id"/>
+            <generator class="identity"/>
+        </id>
+        <many-to-one class="bbdd.pojos.Rols" fetch="select" name="rols">
+            <column name="role_id"/>
+        </many-to-one>
+        <property name="user" type="string">
+            <column length="255" name="user"/>
+        </property>
+        <property name="surname" type="string">
+            <column length="255" name="surname"/>
+        </property>
+        <property name="tel1" type="string">
+            <column length="255" name="`tel-1`"/>
+        </property>
+        <property name="tel2" type="string">
+            <column length="255" name="`tel-2`"/>
+        </property>
+        <property name="address" type="string">
+            <column length="255" name="address"/>
+        </property>
+        <property name="dni" type="string">
+            <column length="255" name="dni" unique="true"/>
+        </property>
+        <property name="name" type="string">
+            <column length="255" name="name" not-null="true"/>
+        </property>
+        <property name="email" type="string">
+            <column length="255" name="email" not-null="true" unique="true"/>
+        </property>
+        <property name="emailVerifiedAt" type="timestamp">
+            <column length="19" name="email_verified_at"/>
+        </property>
+        <property name="password" type="string">
+            <column length="255" name="password" not-null="true"/>
+        </property>
+        <property name="rememberToken" type="string">
+            <column length="100" name="remember_token"/>
+        </property>
+        <property name="createdAt" type="timestamp">
+            <column length="19" name="created_at"/>
+        </property>
+        <property name="updatedAt" type="timestamp">
+            <column length="19" name="updated_at"/>
+        </property>
+        <property name="deletedAt" type="timestamp">
+            <column length="19" name="deleted_at"/>
+        </property>
+        <property name="photo" type="binary">
+            <column name="photo"/>
+        </property>
+        <set fetch="select" inverse="true" lazy="true" name="cicloUsuarios" table="ciclo_usuario">
+            <key>
+                <column name="usuario_id" not-null="true"/>
+            </key>
+            <one-to-many class="bbdd.pojos.CicloUsuario"/>
+        </set>
+        <set fetch="select" inverse="true" lazy="true" name="reunionsesForReceptorId" table="reunions">
+            <key>
+                <column name="receptor_id"/>
+            </key>
+            <one-to-many class="bbdd.pojos.Reunions"/>
+        </set>
+        <set fetch="select" inverse="true" lazy="true" name="reunionsesForEmisorId" table="reunions">
+            <key>
+                <column name="emisor_id"/>
+            </key>
+            <one-to-many class="bbdd.pojos.Reunions"/>
+        </set>
+        <set fetch="select" inverse="true" lazy="true" name="horarioses" table="horarios">
+            <key>
+                <column name="profesor_id" not-null="true"/>
+            </key>
+            <one-to-many class="bbdd.pojos.Horarios"/>
+        </set>
+        <set fetch="select" inverse="true" lazy="true" name="asignaturaUsuarioHorarios" table="asignatura_usuario_horario">
+            <key>
+                <column name="usuario_id" not-null="true"/>
+            </key>
+            <one-to-many class="bbdd.pojos.AsignaturaUsuarioHorario"/>
+        </set>
+    </class>
+</hibernate-mapping>

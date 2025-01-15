@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Generated 15 ene 2025, 17:22:52 by Hibernate Tools 6.5.1.Final --><!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class catalog="laravel" name="bbdd.pojos.Reunions" optimistic-lock="none" table="reunions">
+        <id name="id" type="java.lang.Long">
+            <column name="id"/>
+            <generator class="identity"/>
+        </id>
+        <many-to-one class="bbdd.pojos.Users" fetch="select" name="usersByReceptorId">
+            <column name="receptor_id"/>
+        </many-to-one>
+        <many-to-one class="bbdd.pojos.Users" fetch="select" name="usersByEmisorId">
+            <column name="emisor_id"/>
+        </many-to-one>
+        <property name="comentario" type="string">
+            <column length="255" name="comentario" not-null="true"/>
+        </property>
+        <property name="estado" type="string">
+            <column length="9" name="estado" not-null="true"/>
+        </property>
+        <property name="fechaHoraInicio" type="timestamp">
+            <column length="19" name="`fecha-hora-inicio`" not-null="true"/>
+        </property>
+        <property name="fechaHoraFin" type="timestamp">
+            <column length="19" name="`fecha-hora-fin`" not-null="true"/>
+        </property>
+        <property name="createdAt" type="timestamp">
+            <column length="19" name="created_at"/>
+        </property>
+        <property name="updatedAt" type="timestamp">
+            <column length="19" name="updated_at"/>
+        </property>
+        <property name="deletedAt" type="timestamp">
+            <column length="19" name="deleted_at"/>
+        </property>
+    </class>
+</hibernate-mapping>

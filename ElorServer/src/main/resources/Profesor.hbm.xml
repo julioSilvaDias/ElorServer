@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!-- Generated 15 ene 2025, 23:24:12 by Hibernate Tools 6.5.1.Final --><!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<!-- Generated 15 ene 2025, 23:24:12 by Hibernate Tools 6.5.1.Final -->
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-configuration">
 <hibernate-mapping>
-    <class catalog="ElorBase" name="pojos.Profesor" optimistic-lock="none" table="Profesor">
+    <class catalog="ElorBase" name="bbdd.pojos.Profesor" optimistic-lock="none" table="Profesor">
         <id name="id" type="int">
             <column name="id"/>
-            <generator class="foreign"/>
+            <generator class="foreign">
+                <param name="property">usuario</param>
+            </generator>
         </id>
-        <one-to-one class="pojos.Usuario" constrained="true" name="usuario"/>
+        <one-to-one class="bbdd.pojos.Usuario" constrained="true" name="usuario"/>
     </class>
 </hibernate-mapping>

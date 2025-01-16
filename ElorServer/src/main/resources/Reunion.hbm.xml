@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- Generated 15 ene 2025, 23:24:12 by Hibernate Tools 6.5.1.Final --><!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
-    <class catalog="ElorBase" name="pojos.Reunion" optimistic-lock="none" table="Reunion">
+    <class catalog="ElorBase" name="bbdd.pojos.Reunion" optimistic-lock="none" table="Reunion">
         <id name="id" type="int">
             <column name="id"/>
             <generator class="assigned"/>
@@ -22,7 +22,7 @@
             <key>
                 <column name="id_Reunion" not-null="true"/>
             </key>
-            <one-to-many class="pojos.Cita"/>
+            <one-to-many class="bbdd.pojos.Cita"/>
         </set>
     </class>
 </hibernate-mapping>

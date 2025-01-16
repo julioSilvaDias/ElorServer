@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- Generated 15 ene 2025, 23:24:12 by Hibernate Tools 6.5.1.Final --><!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
-    <class catalog="ElorBase" name="pojos.Usuario" optimistic-lock="none" table="Usuario">
+    <class catalog="ElorBase" name="bbdd.pojos.Usuario" optimistic-lock="none" table="Usuario">
         <id name="id" type="java.lang.Integer">
             <column name="id"/>
             <generator class="identity"/>
         </id>
-        <many-to-one class="pojos.Ciclo" fetch="select" name="ciclo">
+        <many-to-one class="bbdd.pojos.Ciclo" fetch="select" name="ciclo">
             <column name="id_Ciclo"/>
         </many-to-one>
         <property name="login" type="string">
@@ -51,25 +51,25 @@
         <property name="telefono2" type="string">
             <column length="9" name="telefono_2"/>
         </property>
-        <one-to-one class="pojos.Alumno" name="alumno"/>
+        <one-to-one class="bbdd.pojos.Alumno" name="alumno"/>
         <set fetch="select" inverse="true" lazy="true" name="citasForIdProfesor" table="Cita">
             <key>
                 <column name="id_Profesor" not-null="true"/>
             </key>
-            <one-to-many class="pojos.Cita"/>
+            <one-to-many class="bbdd.pojos.Cita"/>
         </set>
         <set fetch="select" inverse="true" lazy="true" name="horarios" table="Horario">
             <key>
                 <column name="id_usuario" not-null="true"/>
             </key>
-            <one-to-many class="pojos.Horario"/>
+            <one-to-many class="bbdd.pojos.Horario"/>
         </set>
-        <one-to-one class="pojos.Profesor" name="profesor"/>
+        <one-to-one class="bbdd.pojos.Profesor" name="profesor"/>
         <set fetch="select" inverse="true" lazy="true" name="citasForIdAlumno" table="Cita">
             <key>
                 <column name="id_Alumno" not-null="true"/>
             </key>
-            <one-to-many class="pojos.Cita"/>
+            <one-to-many class="bbdd.pojos.Cita"/>
         </set>
     </class>
 </hibernate-mapping>

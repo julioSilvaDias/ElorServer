@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- Generated 15 ene 2025, 23:24:12 by Hibernate Tools 6.5.1.Final --><!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
-    <class catalog="ElorBase" name="pojos.Asignatura" optimistic-lock="none" table="Asignatura">
+    <class catalog="ElorBase" name="bbdd.pojos.Asignatura" optimistic-lock="none" table="Asignatura">
         <id name="id" type="int">
             <column name="id"/>
             <generator class="assigned"/>
@@ -16,13 +16,13 @@
             <key>
                 <column name="asignatura"/>
             </key>
-            <one-to-many class="pojos.Horario"/>
+            <one-to-many class="bbdd.pojos.Horario"/>
         </set>
         <set fetch="select" inverse="false" lazy="true" name="ciclos" table="Ciclo_Asignatura">
             <key>
                 <column name="id_Asignatura" not-null="true"/>
             </key>
-            <many-to-many entity-name="pojos.Ciclo">
+            <many-to-many entity-name="bbdd.pojos.Ciclo">
                 <column name="id_Ciclo" not-null="true"/>
             </many-to-many>
         </set>

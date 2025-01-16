@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- Generated 15 ene 2025, 23:24:12 by Hibernate Tools 6.5.1.Final --><!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
-    <class catalog="ElorBase" name="pojos.Cita" optimistic-lock="none" table="Cita">
-        <composite-id class="pojos.CitaId" name="id">
+    <class catalog="ElorBase" name="bbdd.pojos.Cita" optimistic-lock="none" table="Cita">
+        <composite-id class="bbdd.pojos.CitaId" name="id">
             <key-property name="idAlumno" type="int">
                 <column name="id_Alumno"/>
             </key-property>
@@ -13,13 +13,13 @@
                 <column name="id_Reunion"/>
             </key-property>
         </composite-id>
-        <many-to-one class="pojos.Reunion" fetch="select" insert="false" name="reunion" update="false">
+        <many-to-one class="bbdd.pojos.Reunion" fetch="select" insert="false" name="reunion" update="false">
             <column name="id_Reunion" not-null="true"/>
         </many-to-one>
-        <many-to-one class="pojos.Usuario" fetch="select" insert="false" name="usuarioByIdProfesor" update="false">
+        <many-to-one class="bbdd.pojos.Usuario" fetch="select" insert="false" name="usuarioByIdProfesor" update="false">
             <column name="id_Profesor" not-null="true"/>
         </many-to-one>
-        <many-to-one class="pojos.Usuario" fetch="select" insert="false" name="usuarioByIdAlumno" update="false">
+        <many-to-one class="bbdd.pojos.Usuario" fetch="select" insert="false" name="usuarioByIdAlumno" update="false">
             <column name="id_Alumno" not-null="true"/>
         </many-to-one>
     </class>

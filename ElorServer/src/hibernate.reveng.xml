@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-reverse-engineering PUBLIC
+    "-//Hibernate/Hibernate Reverse Engineering DTD 3.0//EN"
+    "http://hibernate.org/dtd/hibernate-reverse-engineering-3.0.dtd">
+
+<hibernate-reverse-engineering>
+    <!-- Filtrado general para todas las tablas -->
+    <table-filter match-name=".*"></table-filter>
+
+    <!-- Mapeo de la tabla Alumno -->
+    <table name="Alumno">
+        <column name="id" property="id"></column>
+    </table>
+
+    <!-- Mapeo de la tabla Asignatura -->
+    <table name="Asignatura">
+        <column name="id" property="id"></column>
+        <column name="nombre" property="nombre"></column>
+        <column name="curso" property="curso"></column>
+    </table>
+
+    <!-- Mapeo de la tabla Ciclo -->
+    <table name="Ciclo">
+        <column name="id" property="id"></column>
+        <column name="codigo" property="codigo"></column>
+        <column name="nombre" property="nombre"></column>
+        <column name="descripcion" property="descripcion"></column>
+    </table>
+
+    <!-- Mapeo de la tabla Ciclo_Asignatura -->
+    <table name="Ciclo_Asignatura">
+        <column name="id_Asignatura" property="idAsignatura"></column>
+        <column name="id_Ciclo" property="idCiclo"></column>
+    </table>
+
+    <!-- Mapeo de la tabla Cita -->
+    <table name="Cita">
+        <column name="id_Reunion" property="idReunion"></column>
+        <column name="id_Alumno" property="idAlumno"></column>
+        <column name="id_Profesor" property="idProfesor"></column>
+    </table>
+
+    <!-- Mapeo de la tabla Cursos_Externos -->
+    <table name="Cursos_Externos">
+        <column name="id" property="id"></column>
+        <column name="titulo" property="titulo"></column>
+        <column name="descripcion" property="descripcion"></column>
+        <column name="fecha_inicio" property="fechaInicio"></column>
+        <column name="fecha_fin" property="fechaFin"></column>
+        <column name="horario" property="horario"></column>
+        <column name="lugar" property="lugar"></column>
+        <column name="contacto" property="contacto"></column>
+        <column name="ciclo_formativo" property="cicloFormativo"></column>
+        <column name="curso" property="curso"></column>
+        <column name="asignatura" property="asignatura"></column>
+    </table>
+
+    <!-- Mapeo de la tabla Horario -->
+    <table name="Horario">
+        <column name="id" property="id"></column>
+        <column name="id_usuario" property="idUsuario"></column>
+        <column name="dia" property="dia"></column>
+        <column name="asignatura" property="asignatura"></column>
+        <column name="tipo" property="tipo"></column>
+        <column name="aula" property="aula"></column>
+    </table>
+
+    <!-- Mapeo de la tabla Profesor -->
+    <table name="Profesor">
+        <column name="id" property="id"></column>
+    </table>
+
+    <!-- Mapeo de la tabla Reunion -->
+    <table name="Reunion">
+        <column name="id" property="id"></column>
+        <column name="fechaHoraInicio" property="fechaHoraInicio"></column>
+        <column name="fechaHoraFin" property="fechaHoraFin"></column>
+        <column name="estado" property="estado"></column>
+        <column name="comentario" property="comentario"></column>
+    </table>
+
+    <!-- Mapeo de la tabla Usuario -->
+    <table name="Usuario">
+        <column name="id" property="id"></column>
+        <column name="login" property="login"></column>
+        <column name="password" property="password"></column>
+        <column name="nombre" property="nombre"></column>
+        <column name="apellidos" property="apellidos"></column>
+        <column name="email" property="email"></column>
+        <column name="telefono" property="telefono"></column>
+        <column name="foto" property="foto"></column>
+        <column name="tipo_usuario" property="tipoUsuario"></column>
+        <column name="ciclo_formativo" property="cicloFormativo"></column>
+        <column name="curso" property="curso"></column>
+        <column name="Duales" property="duales"></column>
+        <column name="DNI" property="dni"></column>
+        <column name="telefono_1" property="telefono1"></column>
+        <column name="telefono_2" property="telefono2"></column>
+        <column name="id_Ciclo" property="idCiclo"></column>
+    </table>
+</hibernate-reverse-engineering>

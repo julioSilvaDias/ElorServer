@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Generated 15 ene 2025, 23:24:12 by Hibernate Tools 6.5.1.Final --><!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class catalog="ElorBase" name="pojos.Profesor" optimistic-lock="none" table="Profesor">
+        <id name="id" type="int">
+            <column name="id"/>
+            <generator class="foreign"/>
+        </id>
+        <one-to-one class="pojos.Usuario" constrained="true" name="usuario"/>
+    </class>
+</hibernate-mapping>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Generated 15 ene 2025, 23:24:12 by Hibernate Tools 6.5.1.Final --><!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class catalog="ElorBase" name="pojos.Horario" optimistic-lock="none" table="Horario">
+        <id name="id" type="java.lang.Integer">
+            <column name="id"/>
+            <generator class="identity"/>
+        </id>
+        <many-to-one class="pojos.Asignatura" fetch="select" name="asignatura">
+            <column name="asignatura"/>
+        </many-to-one>
+        <many-to-one class="pojos.Usuario" fetch="select" name="usuario">
+            <column name="id_usuario" not-null="true"/>
+        </many-to-one>
+        <property name="dia" type="string">
+            <column length="9" name="dia" not-null="true"/>
+        </property>
+        <property name="tipo" type="string">
+            <column length="7" name="tipo" not-null="true"/>
+        </property>
+        <property name="aula" type="string">
+            <column length="50" name="aula"/>
+        </property>
+    </class>
+</hibernate-mapping>

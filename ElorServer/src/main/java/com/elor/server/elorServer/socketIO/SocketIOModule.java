@@ -13,10 +13,12 @@ import com.elor.server.elorServer.socketIO.model.MessageOutput;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
+import bbdd.GestorUsuario;
 import bbdd.pojos.Usuario;
 
 public class SocketIOModule {
 
+	GestorUsuario gestorUsuario = new GestorUsuario();
 	private SocketIOServer server = null;
 
 	public SocketIOModule(SocketIOServer server) {
@@ -76,20 +78,35 @@ public class SocketIOModule {
 
 	private DataListener<MessageInput> login() {
 		return ((client, data, ackSender) -> {
-			System.out.println("Client from " + client.getRemoteAddress() + "wants to login");
+			System.out.println("Client from " + client.getRemoteAddress() + " wants to login");
 
 			String message = data.getMessage();
-
 			Gson gson = new Gson();
-			JsonObject jsonObject = gson.fromJson(message, JsonObject.class);
-			String username = jsonObject.get("login").getAsString();
 
-			Usuario usuario = new Usuario();
+			try {
+				JsonObject jsonObject = gson.fromJson(message, JsonObject.class);
+				String name = jsonObject.get("login").getAsString();
+				String password = jsonObject.get("password").getAsString();
 
-			String answerMessage = gson.toJson(usuario);
+				Usuario usuario = gestorUsuario.login(name, password);
 
-			MessageOutput messageOutput = new MessageOutput(answerMessage);
-			client.sendEvent(Events.ON_LOGIN_ANSWER.value, messageOutput);
+				String respuesta;
+				if (usuario == null) {
+					respuesta = "Usuario no encontrado";
+				} else {
+					respuesta = "Login correcto";
+				}
+
+				String mensaje = gson.toJson(respuesta);
+				MessageOutput messageOutput = new MessageOutput(mensaje);
+				client.sendEvent(Events.ON_LOGIN_ANSWER.value, messageOutput);
+
+			} catch (Exception e) {
+				e.printStackTrace();
+				String errorMensaje = "Error en el proceso de login";
+				MessageOutput messageOutput = new MessageOutput(gson.toJson(errorMensaje));
+				client.sendEvent(Events.ON_LOGIN_ANSWER.value, messageOutput);
+			}
 		});
 	}
 

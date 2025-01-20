@@ -61,7 +61,6 @@ public class SocketIOModule {
 	}
 
 	private DataListener<MessageInput> login() {
-		// TODO Auto-generated method stub
 		return ((client, data, ackSender) -> {
 			System.out.println("Client from " + client.getRemoteAddress() + "wants to login");
 			
@@ -91,10 +90,15 @@ public class SocketIOModule {
 	}
 
 	private ConnectListener OnConnect() {
-		return (client -> {
-			client.joinRoom("default-room");
-			System.out.println("New connection, Client: " + client.getRemoteAddress());
-		});
+	    return (client -> {
+	        try {
+	            client.joinRoom("default-room");
+	            System.out.println("New connection, Client: " + client.getRemoteAddress());
+	        } catch (Exception e) {
+	            System.out.println("Error al conectar cliente: " + client.getRemoteAddress());
+	            e.printStackTrace();
+	        }
+	    });
 	}
 	
 	private DisconnectListener OnDisconnect() {

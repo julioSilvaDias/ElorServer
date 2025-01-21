@@ -22,6 +22,7 @@ public class SocketIOModule {
 	private SocketIOServer server = null;
 
 	public SocketIOModule(SocketIOServer server) {
+		
 		super();
 		this.server = server;
 
@@ -79,14 +80,14 @@ public class SocketIOModule {
 	private DataListener<MessageInput> login() {
 		return ((client, data, ackSender) -> {
 			System.out.println("Client from " + client.getRemoteAddress() + " wants to login");
+			System.out.println("Datos recibidos del cliente: " + data.getMessage());
 
-			String message = data.getMessage();
 			Gson gson = new Gson();
 
 			try {
-				JsonObject jsonObject = gson.fromJson(message, JsonObject.class);
-				String name = jsonObject.get("login").getAsString();
-				String password = jsonObject.get("password").getAsString();
+				JsonObject jsonObject = gson.fromJson(data.getMessage(), JsonObject.class);
+				String name = jsonObject.get("username").getAsString();
+				String password = jsonObject.get("pass").getAsString();
 
 				Usuario usuario = gestorUsuario.login(name, password);
 

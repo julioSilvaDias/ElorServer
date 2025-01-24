@@ -32,4 +32,27 @@ public class GestorUsuario {
 		}
 	}
 
+	public Usuario getUserId(String userName) {
+		SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
+		Session session = null;
+		Usuario ret = null;
+
+		try {
+			session = sessionFactory.openSession();
+			String hql = "FROM Usuario e WHERE e.login = :login";
+			Query<Usuario> query = session.createQuery(hql, Usuario.class);
+			query.setParameter("login", userName);
+			ret = query.uniqueResult();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			if (session != null) {
+				session.close();
+
+			}
+			return ret;
+		}
+
+	}
+
 }

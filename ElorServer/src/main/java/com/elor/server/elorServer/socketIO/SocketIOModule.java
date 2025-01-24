@@ -11,27 +11,32 @@ import com.elor.server.elorServer.socketIO.config.Events;
 import com.elor.server.elorServer.socketIO.model.MessageInput;
 import com.elor.server.elorServer.socketIO.model.MessageOutput;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 
 import bbdd.GestorUsuario;
+import bbdd.HibernateProxyTypeAdapter;
 import bbdd.pojos.Usuario;
+import bbdd.pojos.UsuarioDTO;
 
 public class SocketIOModule {
 
 	GestorUsuario gestorUsuario = new GestorUsuario();
 	private SocketIOServer server = null;
+	private GsonBuilder b = new GsonBuilder();
 
 	public SocketIOModule(SocketIOServer server) {
 		
 		super();
 		this.server = server;
+		
+		b.registerTypeAdapterFactory(HibernateProxyTypeAdapter.FACTORY);
 
 		server.addConnectListener(OnConnect());
 		server.addDisconnectListener(OnDisconnect());
 
 		server.addEventListener(Events.ON_LOGIN.value, MessageInput.class, this.login());
-		server.addEventListener(Events.ON_GET_ALL.value, MessageInput.class, this.getAll());
-		server.addEventListener(Events.ON_LOGOUT.value, MessageInput.class, this.logout());
+		server.addEventListener(Events.ON_GET_USER_ID.value, MessageInput.class, this.getUserId());
 	}
 
 	private ConnectListener OnConnect() {
@@ -48,21 +53,6 @@ public class SocketIOModule {
 		});
 	}
 
-	private DataListener<MessageInput> getAll() {
-		return ((client, data, ackSender) -> {
-			System.out.println("Client from " + client.getRemoteAddress() + " wants to getAll");
-
-			List<Usuario> usuarios = new ArrayList<Usuario>();
-			// añadir nuevo usuario
-			usuarios.add(new Usuario());
-
-			String answerMessage = new Gson().toJson(usuarios);
-
-			MessageOutput messageOutput = new MessageOutput(answerMessage);
-			client.sendEvent(Events.ON_GET_ALL_ANSWER.value, messageOutput);
-		});
-	}
-
 	private DataListener<MessageInput> logout() {
 		return ((client, data, ackSender) -> {
 			System.out.println("Client form " + client.getRemoteAddress() + " wants to logout");
@@ -76,7 +66,7 @@ public class SocketIOModule {
 			System.out.println(username + " loged out");
 		});
 	}
-
+	
 	private DataListener<MessageInput> login() {
 		return ((client, data, ackSender) -> {
 			System.out.println("Client from " + client.getRemoteAddress() + " wants to login");
@@ -109,6 +99,33 @@ public class SocketIOModule {
 				client.sendEvent(Events.ON_LOGIN_ANSWER.value, messageOutput);
 			}
 		});
+	}
+	
+	private DataListener<MessageInput> getUserId() {
+	    return ((client, data, ackSender) -> {
+	        System.out.println("Client from " + client.getRemoteAddress());
+	        System.out.println("Datos recibidos del cliente: " + data.getMessage());
+
+	        Gson gson = b.create();
+
+	        try {
+	            JsonObject jsonObject = gson.fromJson(data.getMessage(), JsonObject.class);
+	            String name = jsonObject.get("username").getAsString();
+	            
+	            Usuario usuario = gestorUsuario.getUserId(name);
+	            UsuarioDTO usuarioDTO = (usuario != null) ? new UsuarioDTO(usuario) : null;
+
+	            String mensaje = gson.toJson(usuarioDTO);
+	            MessageOutput messageOutput = new MessageOutput(mensaje);
+	            client.sendEvent(Events.ON_GET_USER_ID_ANSWER.value, messageOutput);
+
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	            String errorMensaje = "Error en el proceso...";
+	            MessageOutput messageOutput = new MessageOutput(gson.toJson(errorMensaje));
+	            client.sendEvent(Events.ON_GET_USER_ID_ANSWER.value, messageOutput);
+	        }
+	    });
 	}
 
 	public void start() {

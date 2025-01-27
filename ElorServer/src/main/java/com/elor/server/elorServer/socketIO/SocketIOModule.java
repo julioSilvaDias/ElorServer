@@ -22,7 +22,7 @@ public class SocketIOModule {
 	private SocketIOServer server = null;
 
 	public SocketIOModule(SocketIOServer server) {
-		
+
 		super();
 		this.server = server;
 
@@ -78,55 +78,85 @@ public class SocketIOModule {
 	}
 
 	private DataListener<MessageInput> login() {
-	    return ((client, data, ackSender) -> {
-	        System.out.println("Client from " + client.getRemoteAddress() + " wants to login");
-	        System.out.println("Datos recibidos del cliente: " + data.getMessage());
+		return (client, data, ackSender) -> {
+			System.out.println("Client from " + client.getRemoteAddress() + " wants to login");
+			System.out.println("Datos recibidos del cliente: " + data.getMessage());
 
-	        Gson gson = new Gson();
+			Gson gson = new Gson();
 
-	        try {
-	            JsonObject jsonObject = gson.fromJson(data.getMessage(), JsonObject.class);
-	            String username = jsonObject.get("username").getAsString();
-	            String password = jsonObject.get("pass").getAsString();
+			try {
+				// Parseamos el mensaje recibido
+				JsonObject jsonObject = gson.fromJson(data.getMessage(), JsonObject.class);
+				String username = jsonObject.get("username").getAsString();
+				String password = jsonObject.get("pass").getAsString();
 
-	            Usuario usuario = gestorUsuario.login(username, password);
+				// Simulamos un gestor de usuarios
+				Usuario usuario = gestorUsuario.login(username, password);
 
-	            String respuesta;
-	            if (usuario == null) {
-	                respuesta = "Usuario no encontrado";
-	            } else {
-	                respuesta = "Login correcto";
-	            }
+				// Construimos la respuesta
+				String respuesta = (usuario != null) ? "Login correcto" : "Usuario no encontrado";
 
-	            JsonObject response = new JsonObject();
-	            response.addProperty("message", respuesta);
+				JsonObject response = new JsonObject();
+				response.addProperty("message", respuesta);
 
-	            System.out.println("Respuesta enviada al cliente: " + respuesta);
-	            String mensaje = gson.toJson(response);
-	            MessageOutput messageOutput = new MessageOutput(mensaje);
-	            client.sendEvent(Events.ON_LOGIN_ANSWER.value, messageOutput);
+				System.out.println("Respuesta enviada al cliente: " + respuesta);
+				MessageOutput messageOutput = new MessageOutput(gson.toJson(response));
+				client.sendEvent(Events.ON_LOGIN_ANSWER.value, messageOutput);
 
-	            /*
-	            String respuesta;
-	            if (usuario == null) {
-	                respuesta = "Usuario no encontrado";
-	            } else {
-	                respuesta = "Login correcto";
-	            }
+			} catch (Exception e) {
+				e.printStackTrace();
+				String errorMensaje = "Error en el proceso de login: " + e.getMessage();
+				System.out.println("Error procesando login: " + errorMensaje);
 
-	            String mensaje = gson.toJson(respuesta);
-	            MessageOutput messageOutput = new MessageOutput(mensaje);
-	            client.sendEvent(Events.ON_LOGIN_ANSWER.value, messageOutput);*/
+				JsonObject response = new JsonObject();
+				response.addProperty("message", errorMensaje);
 
-	        } catch (Exception e) {
-	            e.printStackTrace();
-	            String errorMensaje = "Error en el proceso de login: " + e.getMessage();
-	            MessageOutput messageOutput = new MessageOutput(gson.toJson(errorMensaje));
-	            client.sendEvent(Events.ON_LOGIN_ANSWER.value, messageOutput);
-	        }
-	    });
+				MessageOutput messageOutput = new MessageOutput(gson.toJson(response));
+				client.sendEvent(Events.ON_LOGIN_ANSWER.value, messageOutput);
+			}
+		};
 	}
-	
+
+	/*
+	 * private DataListener<MessageInput> login() { return ((client, data,
+	 * ackSender) -> { System.out.println("Client from " + client.getRemoteAddress()
+	 * + " wants to login"); System.out.println("Datos recibidos del cliente: " +
+	 * data.getMessage());
+	 * 
+	 * Gson gson = new Gson();
+	 * 
+	 * try { JsonObject jsonObject = gson.fromJson(data.getMessage(),
+	 * JsonObject.class); String username =
+	 * jsonObject.get("username").getAsString(); String password =
+	 * jsonObject.get("pass").getAsString();
+	 * 
+	 * Usuario usuario = gestorUsuario.login(username, password);
+	 * 
+	 * String respuesta; if (usuario == null) { respuesta = "Usuario no encontrado";
+	 * } else { respuesta = "Login correcto"; }
+	 * 
+	 * JsonObject response = new JsonObject(); response.addProperty("message",
+	 * respuesta);
+	 * 
+	 * System.out.println("Respuesta enviada al cliente: " + respuesta); String
+	 * mensaje = gson.toJson(response); MessageOutput messageOutput = new
+	 * MessageOutput(mensaje); client.sendEvent(Events.ON_LOGIN_ANSWER.value,
+	 * messageOutput);
+	 * 
+	 * 
+	 * String respuesta; if (usuario == null) { respuesta = "Usuario no encontrado";
+	 * } else { respuesta = "Login correcto"; }
+	 * 
+	 * String mensaje = gson.toJson(respuesta); MessageOutput messageOutput = new
+	 * MessageOutput(mensaje); client.sendEvent(Events.ON_LOGIN_ANSWER.value,
+	 * messageOutput);
+	 * 
+	 * } catch (Exception e) { e.printStackTrace(); String errorMensaje =
+	 * "Error en el proceso de login: " + e.getMessage(); MessageOutput
+	 * messageOutput = new MessageOutput(gson.toJson(errorMensaje));
+	 * client.sendEvent(Events.ON_LOGIN_ANSWER.value, messageOutput); } }); }
+	 */
+
 	public void start() {
 		server.start();
 		System.out.println("Server started...");

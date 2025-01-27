@@ -16,7 +16,7 @@ public class GestorHorario {
 
 		try {
 			session = sessionFactory.openSession();
-			String hql = "FROM Horario h WHERE h.id_usuario = :idUsuario";
+			String hql = "FROM Horario h WHERE h.usuario.id = :idUsuario";
 			Query query = session.createQuery(hql, Horario.class);
 			query.setParameter("idUsuario", id);
 			

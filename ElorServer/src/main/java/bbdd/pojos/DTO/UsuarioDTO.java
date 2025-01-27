@@ -1,4 +1,6 @@
-package bbdd.pojos;
+package bbdd.pojos.DTO;
+
+import bbdd.pojos.Usuario;
 
 public class UsuarioDTO {
 
@@ -29,8 +31,7 @@ public class UsuarioDTO {
 		this.telefono1 = usuario.getTelefono1();
 		this.telefono2 = usuario.getTelefono2();
 	}
-
-	// Getters y Setters
+	
 	public Integer getId() {
 		return id;
 	}

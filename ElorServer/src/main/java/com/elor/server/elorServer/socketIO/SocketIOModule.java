@@ -14,22 +14,25 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 
+import bbdd.GestorHorario;
 import bbdd.GestorUsuario;
 import bbdd.HibernateProxyTypeAdapter;
+import bbdd.pojos.Horario;
 import bbdd.pojos.Usuario;
-import bbdd.pojos.UsuarioDTO;
+import bbdd.pojos.DTO.UsuarioDTO;
 
 public class SocketIOModule {
 
 	GestorUsuario gestorUsuario = new GestorUsuario();
+	GestorHorario gestorHorario = new GestorHorario();
 	private SocketIOServer server = null;
 	private GsonBuilder b = new GsonBuilder();
 
 	public SocketIOModule(SocketIOServer server) {
-		
+
 		super();
 		this.server = server;
-		
+
 		b.registerTypeAdapterFactory(HibernateProxyTypeAdapter.FACTORY);
 
 		server.addConnectListener(OnConnect());
@@ -37,6 +40,7 @@ public class SocketIOModule {
 
 		server.addEventListener(Events.ON_LOGIN.value, MessageInput.class, this.login());
 		server.addEventListener(Events.ON_GET_USER_ID.value, MessageInput.class, this.getUserId());
+		server.addEventListener(Events.ON_GET_HORARIO.value, MessageInput.class, this.getHorario());
 	}
 
 	private ConnectListener OnConnect() {
@@ -66,7 +70,7 @@ public class SocketIOModule {
 			System.out.println(username + " loged out");
 		});
 	}
-	
+
 	private DataListener<MessageInput> login() {
 		return ((client, data, ackSender) -> {
 			System.out.println("Client from " + client.getRemoteAddress() + " wants to login");
@@ -100,32 +104,58 @@ public class SocketIOModule {
 			}
 		});
 	}
-	
+
 	private DataListener<MessageInput> getUserId() {
-	    return ((client, data, ackSender) -> {
-	        System.out.println("Client from " + client.getRemoteAddress());
-	        System.out.println("Datos recibidos del cliente: " + data.getMessage());
+		return ((client, data, ackSender) -> {
+			System.out.println("Client from " + client.getRemoteAddress());
+			System.out.println("Datos recibidos del cliente: " + data.getMessage());
 
-	        Gson gson = b.create();
+			Gson gson = b.create();
 
-	        try {
-	            JsonObject jsonObject = gson.fromJson(data.getMessage(), JsonObject.class);
-	            String name = jsonObject.get("username").getAsString();
-	            
-	            Usuario usuario = gestorUsuario.getUserId(name);
-	            UsuarioDTO usuarioDTO = (usuario != null) ? new UsuarioDTO(usuario) : null;
+			try {
+				JsonObject jsonObject = gson.fromJson(data.getMessage(), JsonObject.class);
+				String name = jsonObject.get("username").getAsString();
 
-	            String mensaje = gson.toJson(usuarioDTO);
-	            MessageOutput messageOutput = new MessageOutput(mensaje);
-	            client.sendEvent(Events.ON_GET_USER_ID_ANSWER.value, messageOutput);
+				Usuario usuario = gestorUsuario.getUserId(name);
+				UsuarioDTO usuarioDTO = (usuario != null) ? new UsuarioDTO(usuario) : null;
 
-	        } catch (Exception e) {
-	            e.printStackTrace();
-	            String errorMensaje = "Error en el proceso...";
-	            MessageOutput messageOutput = new MessageOutput(gson.toJson(errorMensaje));
-	            client.sendEvent(Events.ON_GET_USER_ID_ANSWER.value, messageOutput);
-	        }
-	    });
+				String mensaje = gson.toJson(usuarioDTO);
+				MessageOutput messageOutput = new MessageOutput(mensaje);
+				client.sendEvent(Events.ON_GET_USER_ID_ANSWER.value, messageOutput);
+
+			} catch (Exception e) {
+				e.printStackTrace();
+				String errorMensaje = "Error en el proceso...";
+				MessageOutput messageOutput = new MessageOutput(gson.toJson(errorMensaje));
+				client.sendEvent(Events.ON_GET_USER_ID_ANSWER.value, messageOutput);
+			}
+		});
+	}
+
+	private DataListener<MessageInput> getHorario() {
+		return ((client, data, ackSender) -> {
+			System.out.println("Client from " + client.getRemoteAddress());
+			System.out.println("Datos recibidos del cliente: " + data.getMessage());
+
+			Gson gson = b.create();
+
+			try {
+				JsonObject jsonObject = gson.fromJson(data.getMessage(), JsonObject.class);
+				String userId = jsonObject.get("message").getAsString();
+				int id = Integer.parseInt(userId);
+				List<Horario> horarios = gestorHorario.getHorarioById(id);
+
+				String mensaje = gson.toJson(horarios);
+				MessageOutput messageOutput = new MessageOutput(mensaje);
+				client.sendEvent(Events.ON_GET_HORARIO_ANSWER.value, messageOutput);
+
+			} catch (Exception e) {
+				e.printStackTrace();
+				String errorMensaje = "Error en el proceso...";
+				MessageOutput messageOutput = new MessageOutput(gson.toJson(errorMensaje));
+				client.sendEvent(Events.ON_GET_HORARIO_ANSWER.value, messageOutput);
+			}
+		});
 	}
 
 	public void start() {

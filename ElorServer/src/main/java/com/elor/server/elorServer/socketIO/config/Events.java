@@ -6,7 +6,9 @@ public enum Events {
 	ON_GET_ALL ("onGetAll"),
     ON_LOGOUT ("onLogout"),
     ON_LOGIN_ANSWER ("onLoginAnswer"),
-	ON_GET_ALL_ANSWER ("onGetAllAnswer");
+	ON_GET_ALL_ANSWER ("onGetAllAnswer"),
+	ON_RESET_PASSWORD("onResetPassword"),
+	ON_RESET_PASSWORD_RESPONSE("resetPasswordResponse");
 	
 	public final String value;
 	

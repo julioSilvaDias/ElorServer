@@ -19,6 +19,7 @@ import bbdd.GestorUsuario;
 import bbdd.HibernateProxyTypeAdapter;
 import bbdd.pojos.Horario;
 import bbdd.pojos.Usuario;
+import bbdd.pojos.DTO.HorarioDTO;
 import bbdd.pojos.DTO.UsuarioDTO;
 
 public class SocketIOModule {
@@ -184,7 +185,7 @@ public class SocketIOModule {
 				JsonObject jsonObject = gson.fromJson(data.getMessage(), JsonObject.class);
 				String userId = jsonObject.get("message").getAsString();
 				int id = Integer.parseInt(userId);
-				List<Horario> horarios = gestorHorario.getHorarioById(id);
+				List<HorarioDTO> horarios = gestorHorario.getHorarioById(id);
 
 				String mensaje = gson.toJson(horarios);
 				MessageOutput messageOutput = new MessageOutput(mensaje);

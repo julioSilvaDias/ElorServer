@@ -179,37 +179,32 @@ public class SocketIOModule {
 	}
 
 	private DataListener<MessageInput> getHorario() {
-		return ((client, data, ackSender) -> {
-			System.out.println("Client from " + client.getRemoteAddress());
-			System.out.println("Datos recibidos del cliente: " + data.getMessage());
+	    return ((client, data, ackSender) -> {
+	        System.out.println("Client from " + client.getRemoteAddress());
+	        System.out.println("Datos recibidos del cliente: " + data.getMessage());
 
-			Gson gson = new Gson();
+	        Gson gson = new Gson();
 
-			try {
-				JsonObject jsonObject = gson.fromJson(data.getMessage(), JsonObject.class);
-				String userId = jsonObject.get("message").getAsString();
-				int id = Integer.parseInt(userId);
+	        try {
+	            JsonObject jsonObject = gson.fromJson(data.getMessage(), JsonObject.class);
+	            String userId = jsonObject.get("message").getAsString();
+	            int id = Integer.parseInt(userId);
 
-				List<HorarioDTO> horarios = gestorHorario.getHorarioById(id);
-				String mensaje = gson.toJson(horarios);
+	            List<HorarioDTO> horarios = gestorHorario.getHorarioById(id);
+	            String mensaje = gson.toJson(horarios);
 
-				byte[] jsonBytes = mensaje.getBytes(StandardCharsets.UTF_8);
-				String jsonUtf8 = new String(jsonBytes, StandardCharsets.UTF_8);
-				MessageOutput messageOutput = new MessageOutput(jsonUtf8);
-				client.sendEvent(Events.ON_GET_HORARIO_ANSWER.value, messageOutput);
+	            MessageOutput messageOutput = new MessageOutput(mensaje);
+	            client.sendEvent(Events.ON_GET_HORARIO_ANSWER.value, messageOutput);
 
-			} catch (Exception e) {
-				e.printStackTrace();
-				String errorMensaje = "Error en el proceso...";
-
-				byte[] errorBytes = errorMensaje.getBytes(StandardCharsets.UTF_8);
-				String errorUtf8 = new String(errorBytes, StandardCharsets.UTF_8);
-
-				MessageOutput messageOutput = new MessageOutput(gson.toJson(errorUtf8));
-				client.sendEvent(Events.ON_GET_HORARIO_ANSWER.value, messageOutput);
-			}
-		});
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	            String errorMensaje = "Error en el proceso...";
+	            MessageOutput messageOutput = new MessageOutput(gson.toJson(errorMensaje));
+	            client.sendEvent(Events.ON_GET_HORARIO_ANSWER.value, messageOutput);
+	        }
+	    });
 	}
+
 
 	private DataListener<MessageInput> resetPassword() {
 		return (client, data, ackSender) -> {

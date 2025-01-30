@@ -7,11 +7,12 @@ public enum Events {
 	ON_GET_USER_ID("onGetUserId"),
 	ON_GET_USER_ID_ANSWER("onGetUserIdAnswer"),
 	ON_GET_HORARIO("onGetHorario"),
-	ON_GET_HORARIO_ANSWER("onGetHorarioAnswer");
+	ON_GET_HORARIO_ANSWER("onGetHorarioAnswer"),
+	ON_RESET_PASSWORD("onResetPassword"),
+	ON_RESET_PASSWORD_RESPONSE("resetPasswordResponse");
 	
 	public final String value;
-	
-	
+		
 	private Events(String value) {
 		this.value = value;
 	}

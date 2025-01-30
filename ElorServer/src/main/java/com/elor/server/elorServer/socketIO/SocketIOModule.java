@@ -205,8 +205,8 @@ public class SocketIOModule {
 	}
 
 	private boolean sendPasswordResetEmail(String username) {
-	    final String senderEmail = "mariajose.suarezhu@elorrieta-errekamari.com";
-	    final String senderPassword = "259Chulina.";
+	    final String senderEmail = "";
+	    final String senderPassword = "";
 	    final String smtpHost = "smtp.gmail.com";
 	    final int smtpPort = 587;
 
@@ -227,7 +227,7 @@ public class SocketIOModule {
 	        Message message = new MimeMessage(session);
 	        message.setFrom(new InternetAddress(senderEmail));
 	       
-	        String recipientEmail = "juanito.pereza.centro@gmail.com";
+	        String recipientEmail = ""; //destinatario
 	        message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(recipientEmail));
 	        message.setSubject("Restablecimiento de contraseña");
 

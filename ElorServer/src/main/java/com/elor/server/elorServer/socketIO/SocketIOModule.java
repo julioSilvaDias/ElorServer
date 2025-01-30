@@ -16,6 +16,14 @@ import com.google.gson.JsonObject;
 
 import bbdd.GestorUsuario;
 import bbdd.pojos.Usuario;
+import jakarta.mail.Authenticator;
+import jakarta.mail.Message;
+import jakarta.mail.MessagingException;
+import jakarta.mail.PasswordAuthentication;
+import jakarta.mail.Session;
+import jakarta.mail.Transport;
+import jakarta.mail.internet.InternetAddress;
+import jakarta.mail.internet.MimeMessage;
 
 public class SocketIOModule {
 
@@ -156,89 +164,85 @@ public class SocketIOModule {
 	}
 	
 	private DataListener<MessageInput> resetPassword() {
-        return (client, data, ackSender) -> {
-            System.out.println("Client from " + client.getRemoteAddress() + " wants to reset password");
-            System.out.println("Received data: " + data.getMessage());
+	    return (client, data, ackSender) -> {
+	        System.out.println("Client from " + client.getRemoteAddress() + " wants to reset password");
+	        System.out.println("Received data: " + data.getMessage());
 
-            Gson gson = new Gson();
+	        Gson gson = new Gson();
 
-            try {
-                JsonObject jsonObject = gson.fromJson(data.getMessage(), JsonObject.class);
-                String username = jsonObject.get("username").getAsString();
+	        try {
+	            JsonObject jsonObject = gson.fromJson(data.getMessage(), JsonObject.class);
+	            String username = jsonObject.get("username").getAsString();
 
-                // Aquí se envía el correo
-                boolean emailSent = sendPasswordResetEmail(username);
+	            boolean emailSent = sendPasswordResetEmail(username);
 
-                JsonObject response = new JsonObject();
-                if (emailSent) {
-                    response.addProperty("success", true);
-                    response.addProperty("message", "Password reset email sent successfully.");
-                } else {
-                    response.addProperty("success", false);
-                    response.addProperty("message", "Error sending reset email.");
-                }
+	            JsonObject response = new JsonObject();
+	            if (emailSent) {
+	                response.addProperty("success", true);
+	                response.addProperty("message", "Password reset email sent successfully.");
+	            } else {
+	                response.addProperty("success", false);
+	                response.addProperty("message", "Error sending reset email.");
+	            }
 
-                MessageOutput messageOutput = new MessageOutput(gson.toJson(response));
-                client.sendEvent(Events.ON_RESET_PASSWORD_RESPONSE.value, messageOutput);
+	            // Enviar respuesta al cliente
+	            MessageOutput messageOutput = new MessageOutput(gson.toJson(response));
+	            client.sendEvent(Events.ON_RESET_PASSWORD_RESPONSE.value, messageOutput);
 
-            } catch (Exception e) {
-                e.printStackTrace();
-                String errorMensaje = "Error processing password reset request: " + e.getMessage();
-                System.out.println(errorMensaje);
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	            String errorMensaje = "Error processing password reset request: " + e.getMessage();
+	            System.out.println(errorMensaje);
 
-                JsonObject response = new JsonObject();
-                response.addProperty("success", false);
-                response.addProperty("message", errorMensaje);
+	            JsonObject response = new JsonObject();
+	            response.addProperty("success", false);
+	            response.addProperty("message", errorMensaje);
 
-                MessageOutput messageOutput = new MessageOutput(gson.toJson(response));
-                client.sendEvent(Events.ON_RESET_PASSWORD_RESPONSE.value, messageOutput);
-            }
-        };
-    }
+	            MessageOutput messageOutput = new MessageOutput(gson.toJson(response));
+	            client.sendEvent(Events.ON_RESET_PASSWORD_RESPONSE.value, messageOutput);
+	        }
+	    };
+	}
 
-/*
-	// Método que envía el correo de restablecimiento de contraseña
-    private boolean sendPasswordResetEmail(String username) {
-        // Configuración para el envío del correo
-        final String senderEmail = "tu_correo@gmail.com"; // Cambiar por tu dirección de correo
-        final String senderPassword = "tu_contraseña";   // Cambiar por la contraseña de tu correo
-        final String smtpHost = "smtp.gmail.com";        // Servidor SMTP de Gmail
-        final int smtpPort = 587;                        // Puerto SMTP de Gmail
+	private boolean sendPasswordResetEmail(String username) {
+	    final String senderEmail = "mariajose.suarezhu@elorrieta-errekamari.com";
+	    final String senderPassword = "259Chulina.";
+	    final String smtpHost = "smtp.gmail.com";
+	    final int smtpPort = 587;
 
-        Properties properties = new Properties();
-        properties.put("mail.smtp.auth", "true");
-        properties.put("mail.smtp.starttls.enable", "true");
-        properties.put("mail.smtp.host", smtpHost);
-        properties.put("mail.smtp.port", smtpPort);
+	    Properties properties = new Properties();
+	    properties.put("mail.smtp.auth", "true");
+	    properties.put("mail.smtp.starttls.enable", "true");
+	    properties.put("mail.smtp.host", smtpHost);
+	    properties.put("mail.smtp.port", smtpPort);
 
-        Session session = Session.getInstance(properties, new Authenticator() {
-            @Override
-            protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication(senderEmail, senderPassword);
-            }
-        });
+	    Session session = Session.getInstance(properties, new Authenticator() {
+	        @Override
+	        protected PasswordAuthentication getPasswordAuthentication() {
+	            return new PasswordAuthentication(senderEmail, senderPassword);
+	        }
+	    });
 
-        try {
-            Message message = new MimeMessage(session);
-            message.setFrom(new InternetAddress(senderEmail));
-            message.setRecipients(Message.RecipientType.TO, InternetAddress.parse("destinatario@example.com")); // Cambiar por el correo del destinatario
-            message.setSubject("Restablecimiento de contraseña");
+	    try {
+	        Message message = new MimeMessage(session);
+	        message.setFrom(new InternetAddress(senderEmail));
+	       
+	        String recipientEmail = "juanito.pereza.centro@gmail.com";
+	        message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(recipientEmail));
+	        message.setSubject("Restablecimiento de contraseña");
 
-            String resetLink = "https://example.com/reset-password?user=" + username;
-            String body = "Hola, " + username + ".\n\nHaz clic en el siguiente enlace para restablecer tu contraseña:\n" + resetLink;
-            message.setText(body);
+	        String body = "Hola, " + username + ".\n\nSe ha solicitado el restablecimiento de tu contraseña. Si no fuiste tú, por favor ignora este correo.";
+	        message.setText(body);
 
-            Transport.send(message);
-            System.out.println("Correo de restablecimiento enviado a " + username);
-            return true;
+	        Transport.send(message);
+	        System.out.println("Correo de restablecimiento enviado a " + username);
+	        return true;
 
-        } catch (MessagingException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }*/
-
-	
+	    } catch (MessagingException e) {
+	        e.printStackTrace();
+	        return false;
+	    }
+	}
 	
 	public void start() {
 		server.start();

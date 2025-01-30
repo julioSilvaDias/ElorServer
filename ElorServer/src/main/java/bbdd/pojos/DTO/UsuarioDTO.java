@@ -6,6 +6,7 @@ public class UsuarioDTO {
 
 	private Integer id;
 	private String login;
+	private String password;
 	private String nombre;
 	private String apellidos;
 	private String email;
@@ -13,6 +14,7 @@ public class UsuarioDTO {
 	private String tipoUsuario;
 	private String cicloFormativo;
 	private Integer curso;
+	private Integer duales;
 	private String dni;
 	private String telefono1;
 	private String telefono2;
@@ -20,6 +22,7 @@ public class UsuarioDTO {
 	public UsuarioDTO(Usuario usuario) {
 		this.id = usuario.getId();
 		this.login = usuario.getLogin();
+		this.password = usuario.getPassword();
 		this.nombre = usuario.getNombre();
 		this.apellidos = usuario.getApellidos();
 		this.email = usuario.getEmail();
@@ -27,6 +30,7 @@ public class UsuarioDTO {
 		this.tipoUsuario = usuario.getTipoUsuario();
 		this.cicloFormativo = usuario.getCicloFormativo();
 		this.curso = usuario.getCurso();
+		this.duales = usuario.getDuales();
 		this.dni = usuario.getDni();
 		this.telefono1 = usuario.getTelefono1();
 		this.telefono2 = usuario.getTelefono2();
@@ -46,6 +50,14 @@ public class UsuarioDTO {
 
 	public void setLogin(String login) {
 		this.login = login;
+	}
+	
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
 	}
 
 	public String getNombre() {
@@ -102,6 +114,14 @@ public class UsuarioDTO {
 
 	public void setCurso(Integer curso) {
 		this.curso = curso;
+	}
+	
+	public Integer getDuales() {
+		return duales;
+	}
+
+	public void setDuales(Integer duales) {
+		this.duales = duales;
 	}
 
 	public String getDni() {

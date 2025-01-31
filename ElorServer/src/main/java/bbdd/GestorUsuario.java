@@ -54,7 +54,29 @@ public class GestorUsuario {
 		}
 
 	}
-	
-	
 
+	public void changePassword(String username, String password) {
+		SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
+		Session session = null;
+
+		try {
+			session = sessionFactory.openSession();
+			session.beginTransaction();
+			String hql = "update Usuario e set e.password = :password WHERE e.login = :login";
+			Query<?> query = session.createQuery(hql);
+			query.setParameter("login", username);
+			query.setParameter("password", password);
+			query.executeUpdate();
+			session.getTransaction().commit();
+		} catch (Exception e) {
+			e.printStackTrace();
+			if (session != null && session.getTransaction() != null) {
+				session.getTransaction().rollback();
+			}
+		} finally {
+			if (session != null) {
+				session.close();
+			}
+		}
+	}
 }

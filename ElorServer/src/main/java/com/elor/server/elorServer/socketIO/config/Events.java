@@ -10,8 +10,8 @@ public enum Events {
 	ON_GET_HORARIO_ANSWER("onGetHorarioAnswer"),
 //	ON_REGISTER("onRegister"),
 //	ON_REGISTER_ANSWER("onRegisterAnswer"),
-//	ON_CHANGE_PASSWORD("onChangePassword"),
-//	ON_CHANGE_PASSWORD_ANSWER("onChangePasswordAnswer")
+	ON_CHANGE_PASSWORD("onChangePassword"),
+	ON_CHANGE_PASSWORD_ANSWER("onChangePasswordAnswer")
 	;
 	
 	public final String value;

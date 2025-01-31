@@ -17,7 +17,6 @@ import com.google.gson.JsonObject;
 import bbdd.GestorHorario;
 import bbdd.GestorUsuario;
 import bbdd.HibernateProxyTypeAdapter;
-import bbdd.pojos.Horario;
 import bbdd.pojos.Usuario;
 import bbdd.pojos.DTO.HorarioDTO;
 import bbdd.pojos.DTO.UsuarioDTO;
@@ -40,8 +39,12 @@ public class SocketIOModule {
 		server.addDisconnectListener(OnDisconnect());
 
 		server.addEventListener(Events.ON_LOGIN.value, MessageInput.class, this.login());
+		server.addEventListener(Events.ON_GET_ALL.value, MessageInput.class, this.getAll());
+		server.addEventListener(Events.ON_LOGOUT.value, MessageInput.class, this.logout());
 		server.addEventListener(Events.ON_GET_USER_ID.value, MessageInput.class, this.getUserId());
 		server.addEventListener(Events.ON_GET_HORARIO.value, MessageInput.class, this.getHorario());
+		server.addEventListener(Events.ON_RESET_PASSWORD.value, MessageInput.class, resetPassword());
+
 	}
 
 	private ConnectListener OnConnect() {
@@ -58,6 +61,21 @@ public class SocketIOModule {
 		});
 	}
 
+	private DataListener<MessageInput> getAll() {
+		return ((client, data, ackSender) -> {
+			System.out.println("Client from " + client.getRemoteAddress() + " wants to getAll");
+
+			List<Usuario> usuarios = new ArrayList<Usuario>();
+			// añadir nuevo usuario
+			usuarios.add(new Usuario());
+
+			String answerMessage = new Gson().toJson(usuarios);
+
+			MessageOutput messageOutput = new MessageOutput(answerMessage);
+			client.sendEvent(Events.ON_GET_ALL_ANSWER.value, messageOutput);
+		});
+	}
+
 	private DataListener<MessageInput> logout() {
 		return ((client, data, ackSender) -> {
 			System.out.println("Client form " + client.getRemoteAddress() + " wants to logout");
@@ -71,7 +89,7 @@ public class SocketIOModule {
 			System.out.println(username + " loged out");
 		});
 	}
-	
+
 	private DataListener<MessageInput> login() {
 		return (client, data, ackSender) -> {
 			System.out.println("Client from " + client.getRemoteAddress() + " wants to login");
@@ -147,6 +165,53 @@ public class SocketIOModule {
 		};
 	}
 
+	private DataListener<MessageInput> resetPassword() {
+        return (client, data, ackSender) -> {
+            /**
+             * Obtiene el email del usuario
+             */
+            String email = data.getEmail();
+            System.out.println("Solicitando restablecimiento de contraseña para: " + email);
+
+            Usuario usuario = gestorUsuario.obtenerUsuarioPorEmail(email);
+
+            /**
+             * Si el usuario no existe en la base de datos
+             */
+            if (usuario == null) {
+                JsonObject response = new JsonObject();
+                response.addProperty("message", "Usuario no es alumno del centro.");
+                client.sendEvent(Events.passwordResetError.value, response);
+                return;
+            }
+
+            /**
+             * Si el usuario intenta acceder con la clave del correo,
+             * le pedira registrarse para hacer el cambio de clave
+             */
+            if ("ElorrietaNueva".equalsIgnoreCase(usuario.getPassword())) {
+                JsonObject response = new JsonObject();
+                response.addProperty("message", "El usuario debe de registrarse.");
+                client.sendEvent(Events.passwordResetError.value, response);
+                return;
+            }
+
+            String newPassword = gestorUsuario.generarNuevaClave();
+
+            boolean emailSent = MailSender.sendEmail(email, newPassword);
+
+            if (emailSent) {
+                JsonObject response = new JsonObject();
+                response.addProperty("message", "Correo enviado correctamente.");
+                client.sendEvent(Events.passwordResetSuccess.value, response);
+            } else {
+                JsonObject response = new JsonObject();
+                response.addProperty("message", "No ha podido enviarse el correo. Intenta nuevamente.");
+                client.sendEvent(Events.passwordResetError.value, response);
+            }
+        };
+    }
+
 	private DataListener<MessageInput> getUserId() {
 		return ((client, data, ackSender) -> {
 			System.out.println("Client from " + client.getRemoteAddress());
@@ -211,4 +276,3 @@ public class SocketIOModule {
 	}
 
 }
-

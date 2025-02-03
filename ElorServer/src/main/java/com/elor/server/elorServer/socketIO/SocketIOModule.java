@@ -3,6 +3,8 @@ package com.elor.server.elorServer.socketIO;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.mail.MessagingException;
+
 import com.corundumstudio.socketio.SocketIOServer;
 import com.corundumstudio.socketio.listener.ConnectListener;
 import com.corundumstudio.socketio.listener.DataListener;
@@ -23,7 +25,8 @@ import bbdd.pojos.DTO.UsuarioDTO;
 
 public class SocketIOModule {
 
-	GestorUsuario gestorUsuario = new GestorUsuario();
+	private EmailService emailService;
+	private GestorUsuario gestorUsuario;
 	GestorHorario gestorHorario = new GestorHorario();
 	private SocketIOServer server = null;
 	private GsonBuilder b = new GsonBuilder();
@@ -35,6 +38,17 @@ public class SocketIOModule {
 
 		b.registerTypeAdapterFactory(HibernateProxyTypeAdapter.FACTORY);
 
+		/**
+		 * Configuracion para el servicio del correo Se usa el puerto 587
+		 */
+		String senderEmail = "mariajose.suarezhu@elorrieta-errekamari.com";
+		String senderPassword = "259Chulina.";
+		String smtpHost = "smtp.gmail.com";
+		int smtpPort = 587;
+
+		this.emailService = new EmailService(senderEmail, senderPassword, smtpHost, smtpPort);
+	    this.gestorUsuario = new GestorUsuario(emailService);
+		
 		server.addConnectListener(OnConnect());
 		server.addDisconnectListener(OnDisconnect());
 
@@ -43,7 +57,7 @@ public class SocketIOModule {
 		server.addEventListener(Events.ON_LOGOUT.value, MessageInput.class, this.logout());
 		server.addEventListener(Events.ON_GET_USER_ID.value, MessageInput.class, this.getUserId());
 		server.addEventListener(Events.ON_GET_HORARIO.value, MessageInput.class, this.getHorario());
-		server.addEventListener(Events.ON_RESET_PASSWORD.value, MessageInput.class, resetPassword());
+		server.addEventListener(Events.ON_RESET_PASSWORD.value, MessageInput.class, this.resetPassword());
 
 	}
 
@@ -66,7 +80,6 @@ public class SocketIOModule {
 			System.out.println("Client from " + client.getRemoteAddress() + " wants to getAll");
 
 			List<Usuario> usuarios = new ArrayList<Usuario>();
-			// añadir nuevo usuario
 			usuarios.add(new Usuario());
 
 			String answerMessage = new Gson().toJson(usuarios);
@@ -166,51 +179,49 @@ public class SocketIOModule {
 	}
 
 	private DataListener<MessageInput> resetPassword() {
-        return (client, data, ackSender) -> {
-            /**
-             * Obtiene el email del usuario
-             */
-            String email = data.getEmail();
-            System.out.println("Solicitando restablecimiento de contraseña para: " + email);
+		return (client, data, ackSender) -> {
 
-            Usuario usuario = gestorUsuario.obtenerUsuarioPorEmail(email);
+			/**
+			 * Obtiene el email del usuario
+			 */
+			String email = data.getEmail();
+			System.out.println("Solicitando restablecimiento de contraseña para: " + email);
 
-            /**
-             * Si el usuario no existe en la base de datos
-             */
-            if (usuario == null) {
-                JsonObject response = new JsonObject();
-                response.addProperty("message", "Usuario no es alumno del centro.");
-                client.sendEvent(Events.passwordResetError.value, response);
-                return;
-            }
+			Usuario usuario = gestorUsuario.obtenerUsuarioPorEmail(email);
 
-            /**
-             * Si el usuario intenta acceder con la clave del correo,
-             * le pedira registrarse para hacer el cambio de clave
-             */
-            if ("ElorrietaNueva".equalsIgnoreCase(usuario.getPassword())) {
-                JsonObject response = new JsonObject();
-                response.addProperty("message", "El usuario debe de registrarse.");
-                client.sendEvent(Events.passwordResetError.value, response);
-                return;
-            }
+			/**
+			 * Si el usuario no existe en la base de datos, le salta un mensaje diciendole
+			 * que no es alumno del centro.
+			 */
+			if (usuario == null) {
+				JsonObject response = new JsonObject();
+				response.addProperty("message", "Usuario no es alumno del centro.");
+				client.sendEvent(Events.passwordResetError.value, response);
+				return;
+			}
 
-            String newPassword = gestorUsuario.generarNuevaClave();
+			/**
+			 * Si el usuario tiene una clave predeterminada, le pedirá registrarse.
+			 */
+			if ("ElorrietaNueva".equalsIgnoreCase(usuario.getPassword())) {
+				JsonObject response = new JsonObject();
+				response.addProperty("message", "El usuario debe registrarse.");
+				client.sendEvent(Events.passwordResetError.value, response);
+				return;
+			}
 
-            boolean emailSent = MailSender.sendEmail(email, newPassword);
+			boolean correoEnviado = gestorUsuario.restablecerClave(email);
 
-            if (emailSent) {
-                JsonObject response = new JsonObject();
-                response.addProperty("message", "Correo enviado correctamente.");
-                client.sendEvent(Events.passwordResetSuccess.value, response);
-            } else {
-                JsonObject response = new JsonObject();
-                response.addProperty("message", "No ha podido enviarse el correo. Intenta nuevamente.");
-                client.sendEvent(Events.passwordResetError.value, response);
-            }
-        };
-    }
+	        JsonObject response = new JsonObject();
+	        if (correoEnviado) {
+	            response.addProperty("message", "Correo enviado correctamente.");
+	            client.sendEvent(Events.passwordResetSuccess.value, response);
+	        } else {
+	            response.addProperty("message", "No se pudo enviar el correo. Intenta nuevamente.");
+	            client.sendEvent(Events.passwordResetError.value, response);
+	        }
+		};
+	}
 
 	private DataListener<MessageInput> getUserId() {
 		return ((client, data, ackSender) -> {

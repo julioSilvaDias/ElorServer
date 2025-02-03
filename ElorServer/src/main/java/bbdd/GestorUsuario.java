@@ -8,14 +8,16 @@ import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.query.Query;
 
-import com.elor.server.elorServer.socketIO.MailSender;
+import com.elor.server.elorServer.socketIO.EmailService;
 
 import bbdd.pojos.Usuario;
 
 public class GestorUsuario {
 	
-	public GestorUsuario() {
-		new MailSender();
+	private EmailService emailService;
+	
+	public GestorUsuario(EmailService emailService) {
+		this.emailService = emailService;
 	}
 	
 	public Usuario login(String name, String password) {
@@ -72,7 +74,7 @@ public class GestorUsuario {
 	public boolean restablecerClave(String email) {
         Usuario usuario = obtenerUsuarioPorEmail(email);
         if (usuario != null) {
-            String nuevaContraseña =generarNuevaClave();
+            String nuevaContraseña = generarNuevaClave();
 
             SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
             Session session = null;
@@ -83,7 +85,6 @@ public class GestorUsuario {
                 transaction = session.beginTransaction();
 
                 usuario.setPassword(nuevaContraseña);
-
                 session.update(usuario);
 
                 transaction.commit();
@@ -98,8 +99,19 @@ public class GestorUsuario {
                     session.close();
                 }
             }
-
-            return MailSender.sendEmail(email, nuevaContraseña);
+            
+            /**
+             * Para mandar el correo
+             */
+            try {
+                String subject = "Restablecimiento de contraseña";
+                String message = "Su nueva contraseña es: " + nuevaContraseña;
+                emailService.sendMail(email, subject, message);
+                return true;
+            } catch (Exception e) {
+                e.printStackTrace();
+                return false;
+            }
         }
         return false;
     }

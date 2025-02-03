@@ -42,7 +42,7 @@ public class SocketIOModule {
 		server.addEventListener(Events.ON_GET_USER_ID.value, MessageInput.class, this.getUserId());
 		server.addEventListener(Events.ON_GET_HORARIO.value, MessageInput.class, this.getHorario());
 		server.addEventListener(Events.ON_CHANGE_PASSWORD.value, MessageInput.class, this.changePassword());
-//		server.addEventListener(Events.ON_REGISTER.value, MessageInput.class, this.register());
+		server.addEventListener(Events.ON_REGISTER.value, MessageInput.class, this.register());
 	}
 
 	private ConnectListener OnConnect() {
@@ -175,32 +175,32 @@ public class SocketIOModule {
 		});
 	}
 	
-//	private DataListener<MessageInput> register() {
-//		return ((client, data, ackSender) -> {
-//			System.out.println("Client from " + client.getRemoteAddress());
-//			System.out.println("Datos recibidos del cliente: " + data.getMessage());
-//
-//			Gson gson = b.create();
-//
-//			try {
-//				JsonObject jsonObject = gson.fromJson(data.getMessage(), JsonObject.class);
-//				String name = jsonObject.get("username").getAsString();
-//
-//				Usuario usuario = gestorUsuario.getUserId(name);
-//				UsuarioDTO usuarioDTO = (usuario != null) ? new UsuarioDTO(usuario) : null;
-//
-//				String mensaje = gson.toJson(usuarioDTO);
-//				MessageOutput messageOutput = new MessageOutput(mensaje);
-//				client.sendEvent(Events.ON_GET_USER_ID_ANSWER.value, messageOutput);
-//
-//			} catch (Exception e) {
-//				e.printStackTrace();
-//				String errorMensaje = "Error en el proceso...";
-//				MessageOutput messageOutput = new MessageOutput(gson.toJson(errorMensaje));
-//				client.sendEvent(Events.ON_GET_USER_ID_ANSWER.value, messageOutput);
-//			}
-//		});
-//	}
+	private DataListener<MessageInput> register() {
+		return ((client, data, ackSender) -> {
+			System.out.println("Client from " + client.getRemoteAddress());
+			System.out.println("Datos recibidos del cliente: " + data.getMessage());
+
+			Gson gson = b.create();
+
+			try {
+				JsonObject jsonObject = gson.fromJson(data.getMessage(), JsonObject.class);
+				String name = jsonObject.get("username").getAsString();
+
+				Usuario usuario = gestorUsuario.getUserId(name);
+				UsuarioDTO usuarioDTO = (usuario != null) ? new UsuarioDTO(usuario) : null;
+
+				String mensaje = gson.toJson(usuarioDTO);
+				MessageOutput messageOutput = new MessageOutput(mensaje);
+				client.sendEvent(Events.ON_REGISTER_ANSWER.value, messageOutput);
+
+			} catch (Exception e) {
+				e.printStackTrace();
+				String errorMensaje = "Error en el proceso...";
+				MessageOutput messageOutput = new MessageOutput(gson.toJson(errorMensaje));
+				client.sendEvent(Events.ON_REGISTER_ANSWER.value, messageOutput);
+			}
+		});
+	}
 	
 	
 	private DataListener<MessageInput> changePassword() {

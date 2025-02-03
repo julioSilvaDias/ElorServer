@@ -9,7 +9,9 @@ public enum Events {
 	ON_GET_HORARIO("onGetHorario"),
 	ON_GET_HORARIO_ANSWER("onGetHorarioAnswer"),
 	ON_RESET_PASSWORD("onResetPassword"),
-	ON_RESET_PASSWORD_RESPONSE("resetPasswordResponse");
+	ON_RESET_PASSWORD_RESPONSE("resetPasswordResponse"),
+	ON_GET_MEETINGS("onGetMeetings"),
+	ON_GET_MEETINGS_ANSWER("onGetMeetingsAnswer");
 	
 	public final String value;
 		

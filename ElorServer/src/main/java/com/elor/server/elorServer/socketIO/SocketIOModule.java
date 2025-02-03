@@ -17,9 +17,11 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 
 import bbdd.GestorHorario;
+import bbdd.GestorReunion;
 import bbdd.GestorUsuario;
 import bbdd.HibernateProxyTypeAdapter;
 import bbdd.pojos.Horario;
+import bbdd.pojos.Reunion;
 import bbdd.pojos.Usuario;
 import bbdd.pojos.DTO.HorarioDTO;
 import bbdd.pojos.DTO.UsuarioDTO;
@@ -28,6 +30,7 @@ public class SocketIOModule {
 
 	GestorUsuario gestorUsuario = new GestorUsuario();
 	GestorHorario gestorHorario = new GestorHorario();
+	GestorReunion gestorReunion = new GestorReunion();
 	private SocketIOServer server = null;
 	private GsonBuilder b = new GsonBuilder();
 
@@ -45,6 +48,7 @@ public class SocketIOModule {
 		server.addEventListener(Events.ON_GET_USER_ID.value, MessageInput.class, this.getUserId());
 		server.addEventListener(Events.ON_GET_HORARIO.value, MessageInput.class, this.getHorario());
 		server.addEventListener(Events.ON_RESET_PASSWORD.value, MessageInput.class, this.resetPassword());
+		server.addEventListener(Events.ON_GET_MEETINGS.value, MessageInput.class, this.getMeetingsByUser());
 
 	}
 
@@ -243,6 +247,33 @@ public class SocketIOModule {
 
 				MessageOutput messageOutput = new MessageOutput(gson.toJson(response));
 				client.sendEvent(Events.ON_RESET_PASSWORD_RESPONSE.value, messageOutput);
+			}
+		};
+	}
+	
+	private DataListener<MessageInput>getMeetingsByUser(){
+		return(client, data, ackSender) -> {
+			System.out.println("Client from " + client.getRemoteAddress() + " meetings");
+			System.out.println("Received data: " + data.getMessage());
+			
+			Gson gson = new Gson();
+			
+			try {
+				JsonObject jsonObject = gson.fromJson(data.getMessage(), JsonObject.class);
+				String userId = jsonObject.get("message").getAsString();
+				
+				int id = Integer.parseInt(userId);
+				List<Reunion> reuniones = gestorReunion.getReunionesByUsuarioId(id);
+				String mensaje = gson.toJson(reuniones);
+				
+				MessageOutput messageOutput = new MessageOutput(mensaje);
+				client.sendEvent(Events.ON_GET_MEETINGS_ANSWER.value, messageOutput);
+				
+			}catch(Exception e) {
+				 e.printStackTrace();
+		            String errorMensaje = "Error en el proceso...";
+		            MessageOutput messageOutput = new MessageOutput(gson.toJson(errorMensaje));
+		            client.sendEvent(Events.ON_GET_MEETINGS_ANSWER.value, messageOutput);
 			}
 		};
 	}

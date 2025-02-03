@@ -1,8 +1,5 @@
 package bbdd;
 
-import java.net.PasswordAuthentication;
-import java.util.Properties;
-
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;

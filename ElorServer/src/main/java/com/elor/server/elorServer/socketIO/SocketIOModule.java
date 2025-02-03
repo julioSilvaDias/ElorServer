@@ -3,8 +3,6 @@ package com.elor.server.elorServer.socketIO;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.mail.MessagingException;
-
 import com.corundumstudio.socketio.SocketIOServer;
 import com.corundumstudio.socketio.listener.ConnectListener;
 import com.corundumstudio.socketio.listener.DataListener;

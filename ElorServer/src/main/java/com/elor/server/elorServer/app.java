@@ -6,6 +6,7 @@ import java.util.logging.Logger;
 import com.corundumstudio.socketio.SocketIOServer;
 import com.elor.server.elorServer.socketIO.SocketIOModule;
 
+
 public class app {
 
 	private static final String HOST_NAME = "0.0.0.0";
@@ -24,6 +25,8 @@ public class app {
         SocketIOServer server = new SocketIOServer(config);
         SocketIOModule module = new SocketIOModule(server);
         module.start();
+        
+        
 	}
 
 }

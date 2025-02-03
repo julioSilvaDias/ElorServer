@@ -1,6 +1,5 @@
 package com.elor.server.elorServer.socketIO;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import com.corundumstudio.socketio.SocketIOServer;
@@ -184,9 +183,17 @@ public class SocketIOModule {
 
 			try {
 				JsonObject jsonObject = gson.fromJson(data.getMessage(), JsonObject.class);
-				String name = jsonObject.get("username").getAsString();
+				String user = jsonObject.get("user").getAsString();
+				String name = jsonObject.get("name").getAsString();
+				String surname = jsonObject.get("surname").getAsString();
+				String dni = jsonObject.get("dni").getAsString();
+				String email = jsonObject.get("email").getAsString();
+				String telefono = jsonObject.get("telefono").getAsString();
+				String telefono2 = jsonObject.get("telefono2").getAsString();
+				String username  = jsonObject.get("user").getAsString();
 
-				Usuario usuario = gestorUsuario.getUserId(name);
+				gestorUsuario.updateUser(user, name, surname, dni, email, telefono, telefono2, username);
+				Usuario usuario = gestorUsuario.getUserId(user);
 				UsuarioDTO usuarioDTO = (usuario != null) ? new UsuarioDTO(usuario) : null;
 
 				String mensaje = gson.toJson(usuarioDTO);

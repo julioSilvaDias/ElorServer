@@ -2,6 +2,7 @@ package bbdd;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 import org.hibernate.query.Query;
 
 import bbdd.pojos.Usuario;
@@ -26,9 +27,8 @@ public class GestorUsuario {
 			if (session != null) {
 				session.close();
 			}
-
-			return ret;
 		}
+		return ret;
 	}
 
 	public Usuario getUserId(String userName) {
@@ -49,28 +49,28 @@ public class GestorUsuario {
 				session.close();
 
 			}
-			return ret;
 		}
-
+		return ret;
 	}
 
 	public void changePassword(String username, String password) {
 		SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
 		Session session = null;
+		Transaction tx = null;
 
 		try {
 			session = sessionFactory.openSession();
-			session.beginTransaction();
+			tx = session.beginTransaction();
 			String hql = "update Usuario e set e.password = :password WHERE e.login = :login";
 			Query<?> query = session.createQuery(hql);
 			query.setParameter("login", username);
 			query.setParameter("password", password);
 			query.executeUpdate();
-			session.getTransaction().commit();
+			tx.commit();
 		} catch (Exception e) {
 			e.printStackTrace();
-			if (session != null && session.getTransaction() != null) {
-				session.getTransaction().rollback();
+			if (tx != null) {
+				tx.rollback();
 			}
 		} finally {
 			if (session != null) {
@@ -78,4 +78,39 @@ public class GestorUsuario {
 			}
 		}
 	}
+
+	public void updateUser(String user, String name, String surname, String dni, String email, String telefono,
+			String telefono2, String username) {
+		SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
+		Session session = null;
+		Transaction tx = null;
+
+		try {
+			session = sessionFactory.openSession();
+			tx = session.beginTransaction();
+			String hql = "update Usuario e set e.login = :login, e.nombre = :name, e.apellidos = :surname, e.email = :email, e.dni = :dni,"
+					+ "e.telefono1 = :telefono, e.telefono2 = :telefono2 WHERE e.login = :login2";
+			Query<?> query = session.createQuery(hql);
+			query.setParameter("login", user);
+			query.setParameter("name", name);
+			query.setParameter("surname", surname);
+			query.setParameter("email", email);
+			query.setParameter("dni", dni);
+			query.setParameter("telefono", telefono);
+			query.setParameter("telefono2", telefono2);
+			query.setParameter("login2", username);
+			query.executeUpdate();
+			tx.commit();
+		} catch (Exception e) {
+			e.printStackTrace();
+			if (tx != null) {
+				tx.rollback();
+			}
+		} finally {
+			if (session != null) {
+				session.close();
+			}
+		}
+	}
+
 }

@@ -1,26 +1,27 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!-- Generated 15 ene 2025, 23:24:12 by Hibernate Tools 6.5.1.Final --><!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" 
+"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
-    <class catalog="ElorBase" name="bbdd.pojos.Cita" optimistic-lock="none" table="Cita">
+    <class catalog="ElorBase" name="bbdd.pojos.Cita" table="Cita">
         <composite-id class="bbdd.pojos.CitaId" name="id">
-            <key-property name="idAlumno" type="int">
-                <column name="id_Alumno"/>
+            <key-property name="idPropietario" type="int"> <!-- Antes id_Alumno -->
+                <column name="id_propietario"/>
             </key-property>
-            <key-property name="idProfesor" type="int">
-                <column name="id_Profesor"/>
+            <key-property name="idDestinatario" type="int"> <!-- Antes id_Profesor -->
+                <column name="id_destinatario"/>
             </key-property>
             <key-property name="idReunion" type="int">
                 <column name="id_Reunion"/>
             </key-property>
         </composite-id>
-        <many-to-one class="bbdd.pojos.Reunion" fetch="select" insert="false" name="reunion" update="false">
+        <many-to-one class="bbdd.pojos.Reunion" name="reunion" insert="false" update="false">
             <column name="id_Reunion" not-null="true"/>
         </many-to-one>
-        <many-to-one class="bbdd.pojos.Usuario" fetch="select" insert="false" name="usuarioByIdProfesor" update="false">
-            <column name="id_Profesor" not-null="true"/>
+        <many-to-one class="bbdd.pojos.Usuario" name="usuarioPropietario" insert="false" update="false">
+            <column name="id_propietario" not-null="true"/>
         </many-to-one>
-        <many-to-one class="bbdd.pojos.Usuario" fetch="select" insert="false" name="usuarioByIdAlumno" update="false">
-            <column name="id_Alumno" not-null="true"/>
+        <many-to-one class="bbdd.pojos.Usuario" name="usuarioDestinatario" insert="false" update="false">
+            <column name="id_destinatario" not-null="true"/>
         </many-to-one>
     </class>
 </hibernate-mapping>

@@ -40,6 +40,8 @@ public class GestorHorario {
 				horarioDTO.setAsignatura(resultSet.getString("asignatura"));
 				horarioDTO.setTipo(resultSet.getString("tipo"));
 				horarioDTO.setAula(resultSet.getString("aula"));
+				horarioDTO.setSemana(resultSet.getInt("semana"));
+				horarioDTO.setHora(resultSet.getString("hora"));
 
 				ret.add(horarioDTO);
 			}

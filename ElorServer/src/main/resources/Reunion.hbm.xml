@@ -1,16 +1,20 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!-- Generated 15 ene 2025, 23:24:12 by Hibernate Tools 6.5.1.Final --><!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" 
+"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
-    <class catalog="ElorBase" name="bbdd.pojos.Reunion" optimistic-lock="none" table="Reunion">
+    <class catalog="ElorBase" name="bbdd.pojos.Reunion" table="Reunion">
         <id name="id" type="int">
             <column name="id"/>
             <generator class="assigned"/>
         </id>
+        <property name="titulo" type="string">
+            <column name="titulo" length="200"/>
+        </property>
         <property name="fechaHoraInicio" type="timestamp">
-            <column length="19" name="fechaHoraInicio"/>
+            <column name="fechaHoraInicio"/>
         </property>
         <property name="fechaHoraFin" type="timestamp">
-            <column length="19" name="fechaHoraFin"/>
+            <column name="fechaHoraFin"/>
         </property>
         <property name="estado" type="string">
             <column length="9" name="estado"/>
@@ -18,10 +22,14 @@
         <property name="comentario" type="string">
             <column length="200" name="comentario"/>
         </property>
-        <set fetch="select" inverse="true" lazy="true" name="citas" table="Cita">
-            <key>
-                <column name="id_Reunion" not-null="true"/>
-            </key>
+        <property name="numAceptadas" type="int">
+            <column name="NumAceptadas" default="0"/>
+        </property>
+        <property name="aula" type="string">
+            <column length="200" name="aula"/>
+        </property>
+        <set inverse="true" lazy="true" name="citas">
+            <key column="id_Reunion"/>
             <one-to-many class="bbdd.pojos.Cita"/>
         </set>
     </class>

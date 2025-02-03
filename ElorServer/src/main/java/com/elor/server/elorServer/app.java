@@ -1,13 +1,7 @@
 package com.elor.server.elorServer;
 
-
-import java.util.List;
-
 import com.corundumstudio.socketio.SocketIOServer;
 import com.elor.server.elorServer.socketIO.SocketIOModule;
-
-import bbdd.GestorReunion;
-import bbdd.pojos.Reunion;
 
 public class app {
 
@@ -16,6 +10,7 @@ public class app {
 	
 	public static void main(String[] args) {
         
+		
         //Configuracion del servidor
         com.corundumstudio.socketio.Configuration config = new com.corundumstudio.socketio.Configuration();
         config.setHostname(HOST_NAME);

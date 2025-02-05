@@ -11,7 +11,9 @@ public enum Events {
 	ON_RESET_PASSWORD("onResetPassword"),
 	ON_RESET_PASSWORD_RESPONSE("resetPasswordResponse"),
 	ON_GET_MEETINGS("onGetMeetings"),
-	ON_GET_MEETINGS_ANSWER("onGetMeetingsAnswer");
+	ON_GET_MEETINGS_ANSWER("onGetMeetingsAnswer"),
+	ON_GET_ALL_CURSOS("onGetAllCursos"),
+	ON_GET_ALL_CURSOS_ANSWER("onGetAllCursosAnswer");
 	
 	public final String value;
 		

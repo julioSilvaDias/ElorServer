@@ -2,6 +2,7 @@ package com.elor.server.elorServer.socketIO;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 import java.util.Properties;
 import com.corundumstudio.socketio.SocketIOServer;
@@ -185,16 +186,17 @@ public class SocketIOModule {
 			}
 		});
 	}
-	
+
 	private DataListener<MessageInput> register() {
-		return ((client, data, ackSender) -> {
-			System.out.println("Client from " + client.getRemoteAddress());
+		return (client, data, ackSender) -> {
+			System.out.println("Cliente desde " + client.getRemoteAddress());
 			System.out.println("Datos recibidos del cliente: " + data.getMessage());
 
 			Gson gson = b.create();
 
 			try {
 				JsonObject jsonObject = gson.fromJson(data.getMessage(), JsonObject.class);
+				String fotoInput = jsonObject.get("foto").getAsString(); // Obtener la cadena Base64
 				String user = jsonObject.get("user").getAsString();
 				String name = jsonObject.get("name").getAsString();
 				String surname = jsonObject.get("surname").getAsString();
@@ -202,9 +204,25 @@ public class SocketIOModule {
 				String email = jsonObject.get("email").getAsString();
 				String telefono = jsonObject.get("telefono").getAsString();
 				String telefono2 = jsonObject.get("telefono2").getAsString();
-				String username  = jsonObject.get("user").getAsString();
+				String username = jsonObject.get("user").getAsString();
 
-				gestorUsuario.updateUser(user, name, surname, dni, email, telefono, telefono2, username);
+				byte[] fotoBytes;
+
+				if (fotoInput.startsWith("data:")) {
+					fotoInput = fotoInput.split(",", 2)[1];
+				}
+
+				fotoInput = fotoInput.replace('-', '+').replace('_', '/');
+				fotoInput = fotoInput.replaceAll("\\s", "");
+
+				int padding = fotoInput.length() % 4;
+				if (padding > 0) {
+					fotoInput += "==".substring(0, 4 - padding);
+				}
+
+				fotoBytes = Base64.getDecoder().decode(fotoInput);
+
+				gestorUsuario.updateUser(fotoBytes, user, name, surname, dni, email, telefono, telefono2, username);
 				Usuario usuario = gestorUsuario.getUserId(user);
 				UsuarioDTO usuarioDTO = (usuario != null) ? new UsuarioDTO(usuario) : null;
 
@@ -214,14 +232,13 @@ public class SocketIOModule {
 
 			} catch (Exception e) {
 				e.printStackTrace();
-				String errorMensaje = "Error en el proceso...";
+				String errorMensaje = "Error en el proceso: " + e.getMessage();
 				MessageOutput messageOutput = new MessageOutput(gson.toJson(errorMensaje));
 				client.sendEvent(Events.ON_REGISTER_ANSWER.value, messageOutput);
 			}
-		});
+		};
 	}
-	
-	
+
 	private DataListener<MessageInput> changePassword() {
 		return ((client, data, ackSender) -> {
 			System.out.println("Client from " + client.getRemoteAddress());
@@ -331,8 +348,8 @@ public class SocketIOModule {
 				String userId = jsonObject.get("message").getAsString();
 
 				int id = Integer.parseInt(userId);
-				List<ReunionDTO> reuniones = gestorReunion.getReunionesByUsuarioId(id);				
-				
+				List<ReunionDTO> reuniones = gestorReunion.getReunionesByUsuarioId(id);
+
 				String mensaje = gson.toJson(reuniones);
 				MessageOutput messageOutput = new MessageOutput(mensaje);
 				client.sendEvent(Events.ON_GET_MEETINGS_ANSWER.value, messageOutput);
@@ -345,23 +362,23 @@ public class SocketIOModule {
 			}
 		};
 	}
-	
-	private DataListener<MessageInput> getAllCursosExternos(){
-		return (client, data, ackSender) ->{
+
+	private DataListener<MessageInput> getAllCursosExternos() {
+		return (client, data, ackSender) -> {
 			System.out.println("Client from " + client.getRemoteAddress() + " Cursos externos");
 			System.out.println("Received data: " + data.getMessage());
-			
+
 			Gson gson = new Gson();
-			
+
 			try {
 				JsonObject jsonObject = gson.fromJson(data.getMessage(), JsonObject.class);
 				List<CursosExternosDTO> cursosExternos = gestorCursosExternos.getAllCursos();
-				
+
 				String mensaje = gson.toJson(cursosExternos);
 				MessageOutput messageOutput = new MessageOutput(mensaje);
 				client.sendEvent(Events.ON_GET_ALL_CURSOS_ANSWER.value, messageOutput);
-				
-			}catch(Exception e) {
+
+			} catch (Exception e) {
 				e.printStackTrace();
 				String errorMensaje = "Error en el proceso...";
 				MessageOutput messageOutput = new MessageOutput(gson.toJson(errorMensaje));

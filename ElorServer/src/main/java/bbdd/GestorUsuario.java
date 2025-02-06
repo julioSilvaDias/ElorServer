@@ -128,7 +128,7 @@ public class GestorUsuario {
 		}
 	}
 
-	public void updateUser(String user, String name, String surname, String dni, String email, String telefono,
+	public void updateUser(byte[] foto, String user, String name, String surname, String dni, String email, String telefono,
 			String telefono2, String username) {
 		SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
 		Session session = null;
@@ -137,9 +137,10 @@ public class GestorUsuario {
 		try {
 			session = sessionFactory.openSession();
 			tx = session.beginTransaction();
-			String hql = "update Usuario e set e.login = :login, e.nombre = :name, e.apellidos = :surname, e.email = :email, e.dni = :dni,"
+			String hql = "update Usuario e set e.foto = :foto, e.login = :login, e.nombre = :name, e.apellidos = :surname, e.email = :email, e.dni = :dni,"
 					+ "e.telefono1 = :telefono, e.telefono2 = :telefono2 WHERE e.login = :login2";
 			Query<?> query = session.createQuery(hql);
+			query.setParameter("foto", foto);
 			query.setParameter("login", user);
 			query.setParameter("name", name);
 			query.setParameter("surname", surname);

@@ -40,7 +40,7 @@ public class SocketIOModule {
 		 * Configuracion para el servicio del correo Se usa el puerto 587
 		 */
 		String senderEmail = "mariajose.suarezhu@elorrieta-errekamari.com";
-		String senderPassword = "259Chulina.";
+		String senderPassword = "";
 		String smtpHost = "smtp.gmail.com";
 		int smtpPort = 587;
 

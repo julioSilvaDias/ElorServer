@@ -4,7 +4,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
-
 import com.corundumstudio.socketio.SocketIOServer;
 import com.corundumstudio.socketio.listener.ConnectListener;
 import com.corundumstudio.socketio.listener.DataListener;
@@ -15,7 +14,6 @@ import com.elor.server.elorServer.socketIO.model.MessageOutput;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
-
 import bbdd.GestorCursosExternos;
 import bbdd.GestorHorario;
 import bbdd.GestorReunion;
@@ -54,7 +52,8 @@ public class SocketIOModule {
 		server.addEventListener(Events.ON_RESET_PASSWORD.value, MessageInput.class, this.resetPassword());
 		server.addEventListener(Events.ON_GET_MEETINGS.value, MessageInput.class, this.getMeetingsByUser());
 		server.addEventListener(Events.ON_GET_ALL_CURSOS.value, MessageInput.class, this.getAllCursosExternos());
-
+		server.addEventListener(Events.ON_CHANGE_PASSWORD.value, MessageInput.class, this.changePassword());
+		server.addEventListener(Events.ON_REGISTER.value, MessageInput.class, this.register());
 	}
 
 	private ConnectListener OnConnect() {
@@ -183,6 +182,71 @@ public class SocketIOModule {
 				String errorMensaje = "Error en el proceso...";
 				MessageOutput messageOutput = new MessageOutput(gson.toJson(errorMensaje));
 				client.sendEvent(Events.ON_GET_USER_ID_ANSWER.value, messageOutput);
+			}
+		});
+	}
+	
+	private DataListener<MessageInput> register() {
+		return ((client, data, ackSender) -> {
+			System.out.println("Client from " + client.getRemoteAddress());
+			System.out.println("Datos recibidos del cliente: " + data.getMessage());
+
+			Gson gson = b.create();
+
+			try {
+				JsonObject jsonObject = gson.fromJson(data.getMessage(), JsonObject.class);
+				String user = jsonObject.get("user").getAsString();
+				String name = jsonObject.get("name").getAsString();
+				String surname = jsonObject.get("surname").getAsString();
+				String dni = jsonObject.get("dni").getAsString();
+				String email = jsonObject.get("email").getAsString();
+				String telefono = jsonObject.get("telefono").getAsString();
+				String telefono2 = jsonObject.get("telefono2").getAsString();
+				String username  = jsonObject.get("user").getAsString();
+
+				gestorUsuario.updateUser(user, name, surname, dni, email, telefono, telefono2, username);
+				Usuario usuario = gestorUsuario.getUserId(user);
+				UsuarioDTO usuarioDTO = (usuario != null) ? new UsuarioDTO(usuario) : null;
+
+				String mensaje = gson.toJson(usuarioDTO);
+				MessageOutput messageOutput = new MessageOutput(mensaje);
+				client.sendEvent(Events.ON_REGISTER_ANSWER.value, messageOutput);
+
+			} catch (Exception e) {
+				e.printStackTrace();
+				String errorMensaje = "Error en el proceso...";
+				MessageOutput messageOutput = new MessageOutput(gson.toJson(errorMensaje));
+				client.sendEvent(Events.ON_REGISTER_ANSWER.value, messageOutput);
+			}
+		});
+	}
+	
+	
+	private DataListener<MessageInput> changePassword() {
+		return ((client, data, ackSender) -> {
+			System.out.println("Client from " + client.getRemoteAddress());
+			System.out.println("Datos recibidos del cliente: " + data.getMessage());
+
+			Gson gson = b.create();
+
+			try {
+				JsonObject jsonObject = gson.fromJson(data.getMessage(), JsonObject.class);
+				String username = jsonObject.get("username").getAsString();
+				String password = jsonObject.get("pass").getAsString();
+
+				gestorUsuario.changePassword(username, password);
+				Usuario usuario = gestorUsuario.getUserId(username);
+				UsuarioDTO usuarioDTO = (usuario != null) ? new UsuarioDTO(usuario) : null;
+
+				String mensaje = gson.toJson(usuarioDTO);
+				MessageOutput messageOutput = new MessageOutput(mensaje);
+				client.sendEvent(Events.ON_CHANGE_PASSWORD_ANSWER.value, messageOutput);
+
+			} catch (Exception e) {
+				e.printStackTrace();
+				String errorMensaje = "Error en el proceso...";
+				MessageOutput messageOutput = new MessageOutput(gson.toJson(errorMensaje));
+				client.sendEvent(Events.ON_CHANGE_PASSWORD_ANSWER.value, messageOutput);
 			}
 		});
 	}

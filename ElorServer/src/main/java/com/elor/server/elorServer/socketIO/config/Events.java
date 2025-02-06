@@ -13,10 +13,15 @@ public enum Events {
 	ON_GET_MEETINGS("onGetMeetings"),
 	ON_GET_MEETINGS_ANSWER("onGetMeetingsAnswer"),
 	ON_GET_ALL_CURSOS("onGetAllCursos"),
-	ON_GET_ALL_CURSOS_ANSWER("onGetAllCursosAnswer");
+	ON_GET_ALL_CURSOS_ANSWER("onGetAllCursosAnswer"),
+	ON_REGISTER("onRegister"),
+	ON_REGISTER_ANSWER("onRegisterAnswer"),
+	ON_CHANGE_PASSWORD("onChangePassword"),
+	ON_CHANGE_PASSWORD_ANSWER("onChangePasswordAnswer");
+	;
 	
 	public final String value;
-		
+	
 	private Events(String value) {
 		this.value = value;
 	}

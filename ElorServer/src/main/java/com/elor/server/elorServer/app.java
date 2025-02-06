@@ -4,9 +4,9 @@ import java.util.List;
 
 import com.corundumstudio.socketio.SocketIOServer;
 import com.elor.server.elorServer.socketIO.SocketIOModule;
-
 import bbdd.GestorCursosExternos;
 import bbdd.pojos.DTO.CursosExternosDTO;
+
 
 public class app {
 
@@ -24,6 +24,8 @@ public class app {
         SocketIOServer server = new SocketIOServer(config);
         SocketIOModule module = new SocketIOModule(server);
         module.start();
+        
+        
 	}
 
 }

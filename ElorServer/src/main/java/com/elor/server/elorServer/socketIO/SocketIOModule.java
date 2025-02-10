@@ -1,10 +1,17 @@
 package com.elor.server.elorServer.socketIO;
 
-import java.nio.charset.StandardCharsets;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 import java.util.Properties;
+
+import javax.crypto.Cipher;
+import javax.crypto.SecretKey;
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.DESKeySpec;
+import javax.crypto.spec.IvParameterSpec;
+
 import com.corundumstudio.socketio.SocketIOServer;
 import com.corundumstudio.socketio.listener.ConnectListener;
 import com.corundumstudio.socketio.listener.DataListener;
@@ -153,7 +160,6 @@ public class SocketIOModule {
 
 				JsonObject response = new JsonObject();
 				response.addProperty("message", errorMensaje);
-
 				MessageOutput messageOutput = new MessageOutput(gson.toJson(response));
 				client.sendEvent(Events.ON_LOGIN_ANSWER.value, messageOutput);
 			}
@@ -172,6 +178,7 @@ public class SocketIOModule {
 				String name = jsonObject.get("username").getAsString();
 
 				Usuario usuario = gestorUsuario.getUserId(name);
+
 				UsuarioDTO usuarioDTO = (usuario != null) ? new UsuarioDTO(usuario) : null;
 
 				String mensaje = gson.toJson(usuarioDTO);
@@ -250,14 +257,37 @@ public class SocketIOModule {
 				JsonObject jsonObject = gson.fromJson(data.getMessage(), JsonObject.class);
 				String username = jsonObject.get("username").getAsString();
 				String password = jsonObject.get("pass").getAsString();
+				String ivBase64 = jsonObject.get("iv").getAsString();
 
-				gestorUsuario.changePassword(username, password);
+				byte[] iv = Base64.getDecoder().decode(ivBase64);
+
+				SecretKeyFactory skf = SecretKeyFactory.getInstance("DES");
+				DESKeySpec clavEspec = new DESKeySpec("Elorrieta00".getBytes());
+				SecretKey claveSecreta = skf.generateSecret(clavEspec);
+
+				Cipher cipher = Cipher.getInstance("DES/CBC/PKCS5Padding");
+				IvParameterSpec ivSpec = new IvParameterSpec(iv);
+				cipher.init(Cipher.DECRYPT_MODE, claveSecreta, ivSpec);
+				byte[] passDecodificado = cipher.doFinal(Base64.getDecoder().decode(password));
+				String passwordDes = new String(passDecodificado, "UTF-8");
+
+				gestorUsuario.changePassword(username, passwordDes);
 				Usuario usuario = gestorUsuario.getUserId(username);
+
+				cipher.init(Cipher.ENCRYPT_MODE, claveSecreta);
+				byte[] passwordCodificada = cipher.doFinal(usuario.getPassword().getBytes("UTF-8"));
+				byte[] ivNuevo = cipher.getIV();
+
+				String passwordE = Base64.getEncoder().encodeToString(passwordCodificada);
+				String ivNuevoBase64 = Base64.getEncoder().encodeToString(ivNuevo);
+
+				usuario.setPassword(passwordE);
 				UsuarioDTO usuarioDTO = (usuario != null) ? new UsuarioDTO(usuario) : null;
 
-				String mensaje = gson.toJson(usuarioDTO);
-				MessageOutput messageOutput = new MessageOutput(mensaje);
-				client.sendEvent(Events.ON_CHANGE_PASSWORD_ANSWER.value, messageOutput);
+				JsonObject response = new JsonObject();
+				response.addProperty("message", gson.toJson(usuarioDTO));
+				response.addProperty("iv", ivNuevoBase64);
+				client.sendEvent(Events.ON_CHANGE_PASSWORD_ANSWER.value, response.toString());
 
 			} catch (Exception e) {
 				e.printStackTrace();
